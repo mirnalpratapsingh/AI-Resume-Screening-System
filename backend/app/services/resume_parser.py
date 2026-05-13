@@ -1,5 +1,6 @@
 import fitz
-from docx import Document
+import docx2txt
+
 from pathlib import Path
 
 
@@ -7,6 +8,7 @@ class ResumeParser:
 
     @staticmethod
     def extract_text_from_pdf(file_path):
+
         text = ""
 
         pdf = fitz.open(file_path)
@@ -18,11 +20,8 @@ class ResumeParser:
 
     @staticmethod
     def extract_text_from_docx(file_path):
-        doc = Document(file_path)
 
-        text = "\n".join(
-            [paragraph.text for paragraph in doc.paragraphs]
-        )
+        text = docx2txt.process(file_path)
 
         return text
 
