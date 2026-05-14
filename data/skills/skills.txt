@@ -1,0 +1,20 @@
+python
+java
+machine learning
+deep learning
+sql
+mongodb
+fastapi
+tensorflow
+pytorch
+data analysis
+nlp
+docker
+aws
+git
+react
+anatomy
+physiology
+pharmacology
+nursing ethics
+patient care management 
