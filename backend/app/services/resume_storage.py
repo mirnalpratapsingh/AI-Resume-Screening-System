@@ -1,4 +1,4 @@
-from app.database.mongodb import MongoDB
+from backend.app.database.mongodb import MongoDB
 
 
 class ResumeStorage:
