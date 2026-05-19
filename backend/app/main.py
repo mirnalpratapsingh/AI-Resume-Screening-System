@@ -4,6 +4,9 @@ from backend.app.services.nlp_processor import NLPProcessor
 from backend.app.services.skill_extractor import SkillExtractor
 from backend.app.services.embedding_service import EmbeddingService
 from backend.app.services.resume_storage import ResumeStorage
+from backend.app.services.candidate_ranker import (
+    CandidateRanker
+)
 
 import shutil
 
@@ -111,3 +114,19 @@ async def upload_resume(
     "skills": skills,
     "similarity_score": float(similarity_score)
 }
+@app.post("/rank-candidates")
+async def rank_candidates():
+
+    # Read Job Description
+    with open(job_description_path, "r") as file:
+        job_description = file.read()
+
+    ranked_candidates = (
+        CandidateRanker.rank_candidates(
+            job_description
+        )
+    )
+
+    return {
+        "ranked_candidates": ranked_candidates
+    }
