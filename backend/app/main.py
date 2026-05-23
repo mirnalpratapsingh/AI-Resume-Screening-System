@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
 from backend.app.services.resume_parser import ResumeParser
 from backend.app.services.nlp_processor import NLPProcessor
 from backend.app.services.skill_extractor import SkillExtractor
@@ -12,6 +13,16 @@ import shutil
 
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:5174"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # Skills File Path
