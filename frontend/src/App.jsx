@@ -53,11 +53,14 @@ function App() {
 
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-10">
 
-      <div className="bg-white w-full max-w-3xl rounded-2xl shadow-xl p-8">
+      <div className="bg-white w-full max-w-4xl rounded-2xl shadow-xl p-8">
 
         <h1 className="text-4xl font-bold text-center mb-8">
           AI Resume Screening System
         </h1>
+
+
+        {/* Upload Section */}
 
         <div className="flex flex-col items-center gap-4">
 
@@ -66,12 +69,25 @@ function App() {
             onChange={(e) =>
               setFile(e.target.files[0])
             }
-            className="border p-2 rounded w-full"
+            className="
+              border
+              p-3
+              rounded-lg
+              w-full
+            "
           />
 
           <button
             onClick={uploadResume}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition"
+            className="
+              bg-blue-600
+              hover:bg-blue-700
+              text-white
+              px-6
+              py-3
+              rounded-lg
+              transition
+            "
           >
             {
               loading
@@ -82,6 +98,9 @@ function App() {
 
         </div>
 
+
+        {/* Response Section */}
+
         {
           response && (
 
@@ -89,29 +108,46 @@ function App() {
 
               <div className="bg-gray-50 p-6 rounded-xl border">
 
-                <h2 className="text-2xl font-semibold mb-4">
+                <h2 className="text-2xl font-semibold mb-6">
                   Analysis Result
                 </h2>
 
+
+                {/* Resume ID */}
+
                 <p className="mb-3">
+
                   <span className="font-semibold">
                     Resume ID:
                   </span>
+
                   {" "}
+
                   {response.resume_id}
+
                 </p>
 
-                <p className="mb-3">
+
+                {/* Similarity Score */}
+
+                <p className="mb-6">
+
                   <span className="font-semibold">
                     Similarity Score:
                   </span>
+
                   {" "}
+
                   {response.similarity_score}
+
                 </p>
+
+
+                {/* Extracted Skills */}
 
                 <div className="mt-5">
 
-                  <h3 className="text-xl font-semibold mb-2">
+                  <h3 className="text-xl font-semibold mb-3">
                     Extracted Skills
                   </h3>
 
@@ -126,6 +162,78 @@ function App() {
                             className="
                               bg-blue-100
                               text-blue-800
+                              px-3
+                              py-1
+                              rounded-full
+                              text-sm
+                            "
+                          >
+                            {skill}
+                          </span>
+                        )
+                      )
+                    }
+
+                  </div>
+
+                </div>
+
+
+                {/* Matched Skills */}
+
+                <div className="mt-8">
+
+                  <h3 className="text-xl font-semibold mb-3">
+                    Matched Skills
+                  </h3>
+
+                  <div className="flex flex-wrap gap-2">
+
+                    {
+                      response.matched_skills.map(
+                        (skill, index) => (
+
+                          <span
+                            key={index}
+                            className="
+                              bg-green-100
+                              text-green-800
+                              px-3
+                              py-1
+                              rounded-full
+                              text-sm
+                            "
+                          >
+                            {skill}
+                          </span>
+                        )
+                      )
+                    }
+
+                  </div>
+
+                </div>
+
+
+                {/* Missing Skills */}
+
+                <div className="mt-8">
+
+                  <h3 className="text-xl font-semibold mb-3">
+                    Missing Skills
+                  </h3>
+
+                  <div className="flex flex-wrap gap-2">
+
+                    {
+                      response.missing_skills.map(
+                        (skill, index) => (
+
+                          <span
+                            key={index}
+                            className="
+                              bg-red-100
+                              text-red-800
                               px-3
                               py-1
                               rounded-full

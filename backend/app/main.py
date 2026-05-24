@@ -8,6 +8,9 @@ from backend.app.services.resume_storage import ResumeStorage
 from backend.app.services.candidate_ranker import (
     CandidateRanker
 )
+from backend.app.services.skill_gap_analyzer import (
+    SkillGapAnalyzer
+)
 
 import shutil
 
@@ -78,6 +81,13 @@ async def upload_resume(
         skills_list
     )
 
+    skill_gap_analysis = (
+        SkillGapAnalyzer.analyze(
+            skills,
+            skills_list
+        )
+    )
+
     # Read Job Description
     with open(job_description_path, "r") as file:
         job_description = file.read()
@@ -120,11 +130,24 @@ async def upload_resume(
     )
 
     return {
-    "message": "Resume uploaded successfully",
-    "resume_id": resume_id,
-    "skills": skills,
-    "similarity_score": float(similarity_score)
-}
+        "message": "Resume uploaded successfully",
+        "resume_id": resume_id,
+        "skills": skills,
+        "similarity_score": float(
+            similarity_score
+        ),
+        "matched_skills": (
+            skill_gap_analysis[
+                "matched_skills"
+            ]
+        ),
+        "missing_skills": (
+            skill_gap_analysis[
+                "missing_skills"
+            ]
+        )
+    }
+
 @app.post("/rank-candidates")
 async def rank_candidates():
 
