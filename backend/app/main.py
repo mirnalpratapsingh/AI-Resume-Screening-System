@@ -1,4 +1,6 @@
 from fastapi import FastAPI, UploadFile, File
+from fastapi.responses import JSONResponse
+import traceback
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app.services.resume_parser import ResumeParser
 from backend.app.services.nlp_processor import NLPProcessor
@@ -11,7 +13,12 @@ from backend.app.services.candidate_ranker import (
 from backend.app.services.skill_gap_analyzer import (
     SkillGapAnalyzer
 )
-
+from backend.app.services.resume_summarizer import (
+    ResumeSummarizer
+)
+from backend.app.services.experience_extractor import (
+    ExperienceExtractor
+)
 import shutil
 
 
@@ -63,6 +70,16 @@ async def upload_resume(
     # Extract Resume Text
     resume_text = ResumeParser.extract_text(
         file_location
+    )
+    experience_years = (
+        ExperienceExtractor.extract_experience(
+            resume_text
+        )
+    )
+    resume_summary = (
+        ResumeSummarizer.summarize(
+            resume_text
+        )
     )
 
     # NLP Processing
@@ -116,6 +133,8 @@ async def upload_resume(
     # Resume Data
     resume_data = {
         "resume_text": resume_text,
+        "experience_years": experience_years,
+        "summary": resume_summary,
         "email": processed_data["email"],
         "phone": processed_data["phone"],
         "skills": skills,
@@ -133,6 +152,8 @@ async def upload_resume(
         "message": "Resume uploaded successfully",
         "resume_id": resume_id,
         "skills": skills,
+        "experience_years": experience_years,
+        "summary": resume_summary,
         "similarity_score": float(
             similarity_score
         ),
@@ -148,19 +169,27 @@ async def upload_resume(
         )
     }
 
-@app.post("/rank-candidates")
+@app.get("/rank-candidates")
 async def rank_candidates():
 
-    # Read Job Description
-    with open(job_description_path, "r") as file:
-        job_description = file.read()
+    try:
+        # Read Job Description
+        with open(job_description_path, "r") as file:
+            job_description = file.read()
 
-    ranked_candidates = (
-        CandidateRanker.rank_candidates(
-            job_description
+        ranked_candidates = (
+            CandidateRanker.rank_candidates(
+                job_description
+            )
         )
-    )
 
-    return {
-        "ranked_candidates": ranked_candidates
-    }
+        return {
+            "ranked_candidates": ranked_candidates
+        }
+
+    except Exception as e:
+        tb = traceback.format_exc()
+        return JSONResponse(
+            status_code=500,
+            content={"error": str(e), "traceback": tb}
+        )
