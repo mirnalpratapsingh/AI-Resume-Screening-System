@@ -111,6 +111,25 @@ function App() {
                   </p>
                 </div>
               </div>
+
+              {/* Education */}
+
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold mb-3">Education</h3>
+
+                <div className="bg-gray-100 p-4 rounded-lg">
+                  <p className="mb-2">
+                    <span className="font-semibold">Degrees:</span>{" "}
+                    {response.education.degrees.join(", ")}
+                  </p>
+
+                  <p>
+                    <span className="font-semibold">Graduation Years:</span>{" "}
+                    {response.education.graduation_years.join(", ")}
+                  </p>
+                </div>
+              </div>
+
               {/* Similarity Score */}
 
               <p className="mb-6">
