@@ -1,8 +1,19 @@
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
+import { useEffect } from "react";
 import { useState } from "react";
 
 function App() {
   const [file, setFile] = useState(null);
-
+  const [analytics, setAnalytics] = useState(null);
   const [response, setResponse] = useState(null);
 
   const [loading, setLoading] = useState(false);
@@ -36,7 +47,20 @@ function App() {
       setLoading(false);
     }
   };
+  const fetchAnalytics = async () => {
+    try {
+      const res = await fetch("http://127.0.0.1:8000/analytics");
 
+      const data = await res.json();
+
+      setAnalytics(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  useEffect(() => {
+    fetchAnalytics();
+  }, []);
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-10">
       <div className="bg-white w-full max-w-4xl rounded-2xl shadow-xl p-8">
@@ -80,7 +104,85 @@ function App() {
           <div className="mt-10">
             <div className="bg-gray-50 p-6 rounded-xl border">
               <h2 className="text-2xl font-semibold mb-6">Analysis Result</h2>
+              {analytics && (
+                <div className="mt-12">
+                  <h2 className="text-3xl font-bold mb-6">
+                    Recruiter Analytics Dashboard
+                  </h2>
 
+                  {/* Stats */}
+
+                  <div className="grid grid-cols-2 gap-4 mb-8">
+                    <div className="bg-white p-6 rounded-xl shadow">
+                      <h3 className="text-lg font-semibold">Total Resumes</h3>
+
+                      <p className="text-3xl mt-2">{analytics.total_resumes}</p>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-xl shadow">
+                      <h3 className="text-lg font-semibold">Avg Experience</h3>
+
+                      <p className="text-3xl mt-2">
+                        {analytics.average_experience}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Skills Chart */}
+
+                  <div className="bg-white p-6 rounded-xl shadow mb-8">
+                    <h3 className="text-xl font-semibold mb-4">Top Skills</h3>
+
+                    <BarChart
+                      width={500}
+                      height={300}
+                      data={analytics.top_skills.map(([skill, count]) => ({
+                        skill,
+                        count,
+                      }))}
+                    >
+                      <XAxis dataKey="skill" />
+
+                      <YAxis />
+
+                      <Tooltip />
+
+                      <Bar dataKey="count" />
+                    </BarChart>
+                  </div>
+
+                  {/* Degree Distribution */}
+
+                  <div className="bg-white p-6 rounded-xl shadow">
+                    <h3 className="text-xl font-semibold mb-4">
+                      Degree Distribution
+                    </h3>
+
+                    <PieChart width={400} height={300}>
+                      <Pie
+                        data={Object.entries(analytics.degree_distribution).map(
+                          ([degree, value]) => ({
+                            name: degree,
+                            value,
+                          }),
+                        )}
+                        dataKey="value"
+                        nameKey="name"
+                        outerRadius={100}
+                        label
+                      >
+                        {Object.entries(analytics.degree_distribution).map(
+                          (_, index) => (
+                            <Cell key={index} />
+                          ),
+                        )}
+                      </Pie>
+
+                      <Tooltip />
+                    </PieChart>
+                  </div>
+                </div>
+              )}
               {/* Resume ID */}
 
               <p className="mb-3">
@@ -208,6 +310,14 @@ function App() {
                   ))}
                 </div>
               </div>
+              <h3 className="text-xl font-semibold mb-3">
+                Candidate Evaluation
+              </h3>
+
+              <p>
+                <strong>Recommendation:</strong>
+                {response.candidate_evaluation.recommendation}
+              </p>
             </div>
           </div>
         )}

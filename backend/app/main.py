@@ -10,6 +10,12 @@ from backend.app.services.resume_storage import ResumeStorage
 from backend.app.services.candidate_ranker import (
     CandidateRanker
 )
+from backend.app.services.analytics_service import (
+    AnalyticsService
+)
+from backend.app.services.education_extractor import (
+    EducationExtractor
+)
 from backend.app.services.skill_gap_analyzer import (
     SkillGapAnalyzer
 )
@@ -18,6 +24,9 @@ from backend.app.services.resume_summarizer import (
 )
 from backend.app.services.experience_extractor import (
     ExperienceExtractor
+)
+from backend.app.services.candidate_evaluator import (
+    CandidateEvaluator
 )
 import shutil
 
@@ -61,7 +70,7 @@ async def upload_resume(
 
     # Save Uploaded Resume
     file_location = (
-        f"data/resumes/{file.filename}"
+        f"C:/Users/mirna/OneDrive/Desktop/ML/resume-ai/data/resumes/{file.filename}"
     )
 
     with open(file_location, "wb") as buffer:
@@ -71,11 +80,22 @@ async def upload_resume(
     resume_text = ResumeParser.extract_text(
         file_location
     )
+
+    # Education Extraction
+    education_data = (
+        EducationExtractor.extract_education(
+            resume_text
+        )
+    )
+
+    # Experience Extraction
     experience_years = (
         ExperienceExtractor.extract_experience(
             resume_text
         )
     )
+
+    # Resume Summary
     resume_summary = (
         ResumeSummarizer.summarize(
             resume_text
@@ -98,6 +118,7 @@ async def upload_resume(
         skills_list
     )
 
+    # Skill Gap Analysis
     skill_gap_analysis = (
         SkillGapAnalyzer.analyze(
             skills,
@@ -106,7 +127,11 @@ async def upload_resume(
     )
 
     # Read Job Description
-    with open(job_description_path, "r") as file:
+    with open(
+        job_description_path,
+        "r",
+        encoding="utf-8"
+    ) as file:
         job_description = file.read()
 
     # Generate Embeddings
@@ -130,17 +155,34 @@ async def upload_resume(
         )
     )
 
+    # Candidate Evaluation
+    candidate_evaluation = (
+        CandidateEvaluator.evaluate(
+            similarity_score=float(
+                similarity_score
+            ),
+            skills=skills,
+            missing_skills=skill_gap_analysis[
+                "missing_skills"
+            ],
+            experience_years=experience_years,
+            education_data=education_data
+        )
+    )
+
     # Resume Data
     resume_data = {
         "resume_text": resume_text,
         "experience_years": experience_years,
         "summary": resume_summary,
+        "education": education_data,
         "email": processed_data["email"],
         "phone": processed_data["phone"],
         "skills": skills,
         "similarity_score": float(
             similarity_score
-        )
+        ),
+        "candidate_evaluation": candidate_evaluation
     }
 
     # Store Resume
@@ -153,6 +195,7 @@ async def upload_resume(
         "resume_id": resume_id,
         "skills": skills,
         "experience_years": experience_years,
+        "education": education_data,
         "summary": resume_summary,
         "similarity_score": float(
             similarity_score
@@ -166,9 +209,11 @@ async def upload_resume(
             skill_gap_analysis[
                 "missing_skills"
             ]
+        ),
+        "candidate_evaluation": (
+            candidate_evaluation
         )
     }
-
 @app.get("/rank-candidates")
 async def rank_candidates():
 
@@ -193,3 +238,11 @@ async def rank_candidates():
             status_code=500,
             content={"error": str(e), "traceback": tb}
         )
+@app.get("/analytics")
+async def analytics():
+
+    analytics_data = (
+        AnalyticsService.generate_analytics()
+    )
+
+    return analytics_data
