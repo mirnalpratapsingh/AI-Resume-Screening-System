@@ -13,6 +13,7 @@ from backend.app.services.candidate_ranker import (
 from backend.app.services.analytics_service import (
     AnalyticsService
 )
+from pathlib import Path
 from backend.app.services.education_extractor import (
     EducationExtractor
 )
@@ -43,15 +44,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+print(BASE_DIR)
 # Skills File Path
 skills_file_path = (
-    "C:/Users/mirna/OneDrive/Desktop/ML/resume-ai/data/skills/skills.txt"
+    BASE_DIR /
+    "data" /
+    "skills" /
+    "skills.txt"
 )
 
 # Job Description Path
 job_description_path = (
-    "C:/Users/mirna/OneDrive/Desktop/ML/resume-ai/data/job_descriptions/ml_engineer.txt"
+    BASE_DIR /
+    "data" /
+    "job_descriptions" /
+    "ml_engineer.txt"
 )
 
 
@@ -69,8 +77,20 @@ async def upload_resume(
 ):
 
     # Save Uploaded Resume
+    resume_dir = (
+        BASE_DIR /
+        "data" /
+        "resumes"
+    )
+
+    resume_dir.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
     file_location = (
-        f"C:/Users/mirna/OneDrive/Desktop/ML/resume-ai/data/resumes/{file.filename}"
+        resume_dir /
+        file.filename
     )
 
     with open(file_location, "wb") as buffer:
