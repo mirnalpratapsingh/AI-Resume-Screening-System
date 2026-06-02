@@ -30,8 +30,19 @@ from backend.app.services.candidate_evaluator import (
     CandidateEvaluator
 )
 import shutil
+from backend.app.services.chat_service import (
+    ChatService
+)
+from backend.app.services.gemini_chat import (
+    GeminiChat
+)
+from pydantic import BaseModel
 
 
+class ChatRequest(
+    BaseModel
+):
+    question: str
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -266,3 +277,23 @@ async def analytics():
     )
 
     return analytics_data
+
+@app.post("/chat")
+async def chat(
+    request: ChatRequest
+):
+
+    candidate_context = (
+        ChatService.build_candidate_context()
+    )
+
+    answer = (
+        GeminiChat.ask(
+            request.question,
+            candidate_context
+        )
+    )
+
+    return {
+        "answer": answer
+    }
