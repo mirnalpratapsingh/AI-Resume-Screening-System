@@ -36,6 +36,9 @@ from backend.app.services.chat_service import (
 from backend.app.services.gemini_chat import (
     GeminiChat
 )
+from backend.app.services.candidate_search import (
+    CandidateSearch
+)
 from pydantic import BaseModel
 
 
@@ -296,4 +299,19 @@ async def chat(
 
     return {
         "answer": answer
+    }
+@app.get("/search-by-skill")
+async def search_by_skill(
+    skill: str
+):
+
+    results = (
+        CandidateSearch.search_by_skill(
+            skill
+        )
+    )
+
+    return {
+        "count": len(results),
+        "results": results
     }
