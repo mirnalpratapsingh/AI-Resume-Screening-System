@@ -41,6 +41,21 @@ from backend.app.services.candidate_search import (
 )
 from pydantic import BaseModel
 
+from pydantic import BaseModel
+from typing import Optional
+from pydantic import BaseModel
+from typing import Optional
+
+
+class SearchRequest(
+    BaseModel
+):
+
+    skill: Optional[str] = None
+
+    min_experience: Optional[int] = None
+
+    min_similarity: Optional[float] = None
 
 class ChatRequest(
     BaseModel
@@ -308,6 +323,25 @@ async def search_by_skill(
     results = (
         CandidateSearch.search_by_skill(
             skill
+        )
+    )
+
+    return {
+        "count": len(results),
+        "results": results
+    }
+@app.post("/search-candidates")
+async def search_candidates(
+    request: SearchRequest
+):
+
+    results = (
+        CandidateSearch.search_candidates(
+            skill=request.skill,
+            min_experience=
+                request.min_experience,
+            min_similarity=
+                request.min_similarity
         )
     )
 
